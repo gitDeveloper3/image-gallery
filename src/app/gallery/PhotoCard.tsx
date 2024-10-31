@@ -145,6 +145,7 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
 
         {/* Display the tags */}
         <Typography  variant="body2" sx={{ marginTop: 1,...overflowStles }}>
+          
           <strong>Tags:</strong>{" "}
           {photo.tags.length > 0 ? photo.tags.join(", ") : "No tags available"}
         </Typography>
