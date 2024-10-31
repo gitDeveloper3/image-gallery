@@ -22,14 +22,23 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [snackbarText,setSnackbarText]=useState("Photo deleted successfully!");
 
+  const overflowStles={
+    textOverflow:"ellipsis",
+    maxWidth:"32ch",
+    overflow:"hidden",
+    whiteSpace:"nowrap"
+  }
   const handleDeletePhoto = async (dbId: string, gDriveUrl: string) => {
     const gDriveId = gDriveUrl.split("id=")[1];
 
     setLoading(true); // Set loading to true when starting deletion
     try {
       await deletePhotoAction(dbId, gDriveId);
+      setSnackbarText("Photo deleted successfully")
       setSuccess(true); // Set success state if deletion is successful
+   
       onActionComplete(); // Notify parent component
     } catch (error) {
       console.log(error);
@@ -55,21 +64,25 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
   // Function to copy image tag to clipboard
   const copyToClipboard = () => {
     const gDriveId = photo.url.split("id=")[1];
+    const attributionEscaped = (photo.attribution || "").replace(/"/g, "&quot;");
+  
     const imgTag = `<img src="https://drive.google.com/uc?export=view&id=${gDriveId}" caption="${
       photo.attributes?.caption || ""
     }" alt="${photo.name}" 
-    attribution="${photo.attribution}"
+    attribution="${attributionEscaped}"
     />`;
-
+  
     navigator.clipboard
       .writeText(imgTag)
       .then(() => {
+        setSnackbarText("<img> copied to clipbaord")
         setSuccess(true); // Show success message or notification
       })
       .catch((err) => {
         console.error("Failed to copy: ", err); // Handle the error case
       });
   };
+  
 
   return (
     <Card
@@ -105,18 +118,19 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
       />
 
       <CardContent>
-        <Typography variant="subtitle1">
+      
+        <Typography sx={overflowStles} variant="subtitle1">
           <strong>Photo Name:</strong> {photo.name}
         </Typography>
-        <Typography variant="body2">
+        <Typography sx={overflowStles} variant="body2">
           <strong>Caption:</strong>{" "}
           {photo.attributes?.caption || "No caption available"}
         </Typography>
-        <Typography variant="body2">
+        <Typography sx={overflowStles} variant="body2">
           <strong>Uploaded by:</strong>{" "}
           {photo.attributes?.uploadedBy || "Unknown"}
         </Typography>
-        <Typography variant="body2">
+        <Typography  variant="body2">
           <strong>Created at:</strong>{" "}
           {new Date(
             photo.attributes?.createdAt ?? Date.now()
@@ -124,13 +138,13 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
         </Typography>
 
         {/* Display the attribution */}
-        <Typography variant="body2">
+        <Typography sx={overflowStles} variant="body2">
           <strong>Attribution:</strong>{" "}
           {photo.attribution || "No attribution provided"}
         </Typography>
 
         {/* Display the tags */}
-        <Typography variant="body2" sx={{ marginTop: 1 }}>
+        <Typography sx={overflowStles} variant="body2" sx={{ marginTop: 1 }}>
           <strong>Tags:</strong>{" "}
           {photo.tags.length > 0 ? photo.tags.join(", ") : "No tags available"}
         </Typography>
@@ -168,7 +182,7 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
         open={success}
         autoHideDuration={6000}
         onClose={() => setSuccess(false)}
-        message="Photo deleted successfully!"
+        message={snackbarText}
       />
     </Card>
   );

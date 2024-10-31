@@ -60,6 +60,9 @@ export default function PhotoUploadForm({ onUploadSuccess }: { onUploadSuccess: 
 
   return (
     <Container>
+      <Typography variant="h5" gutterBottom>
+        Add Photo
+      </Typography>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Controller
           name="name"
