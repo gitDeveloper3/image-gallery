@@ -1,7 +1,7 @@
 // src/services/photoService.ts
 import PhotoModel from '@/models/Photo';
 import { connectToDatabase } from '@/lib/mongodb';
-import { Photo, photoSchema, PhotoWithID } from '@/schemas/photoSchema';
+import {  photoSchema } from '@/schemas/photoSchema';
 import mongoose from 'mongoose';
 
 export const savePhoto = async (photoData: any) => {

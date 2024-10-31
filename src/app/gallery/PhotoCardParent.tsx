@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import PhotoCard from "./PhotoCard";
-import { deletePhotoAction, fetchPhotos } from "@/actions/photoActions";
+import {  fetchPhotos } from "@/actions/photoActions";
 import { PhotoWithID as Photo } from "@/schemas/photoSchema";
 import PhotoUploadForm from "./PhotoUploadForm";
 import { Grid, Box, TextField, Select, MenuItem, Container } from "@mui/material";
@@ -39,7 +39,7 @@ export default function PhotoCardParent() {
 
   useEffect(() => {
     refreshPhotos();
-  }, [nameFilter, tagFilter, pageFilter]);
+  }, [nameFilter, tagFilter, pageFilter,refreshPhotos]);
 
   const lastPhotoRef = useCallback((node: HTMLDivElement | null) => {
     if (observer.current) observer.current.disconnect();
@@ -51,15 +51,15 @@ export default function PhotoCardParent() {
     if (node) observer.current.observe(node);
   }, [loadMorePhotos, hasMore]);
 
-  const handleDeletePhoto = async (dbId: string, gDriveUrl: string) => {
-    const gDriveId = gDriveUrl.split("id=")[1];
-    try {
-      await deletePhotoAction(dbId, gDriveId);
-      refreshPhotos();
-    } catch (error) {
-      console.error("Error deleting photo", error);
-    }
-  };
+  // const handleDeletePhoto = async (dbId: string, gDriveUrl: string) => {
+  //   const gDriveId = gDriveUrl.split("id=")[1];
+  //   try {
+  //     await deletePhotoAction(dbId, gDriveId);
+  //     refreshPhotos();
+  //   } catch (error) {
+  //     console.error("Error deleting photo", error);
+  //   }
+  // };
 
   return (
     <Container>

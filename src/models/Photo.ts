@@ -1,5 +1,5 @@
 // src/models/Photo.ts
-import mongoose, { Schema, model, models } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 
 const photoSchema = new Schema({
   fileId: { type: String, required: true },

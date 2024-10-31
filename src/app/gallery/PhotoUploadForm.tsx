@@ -53,6 +53,7 @@ export default function PhotoUploadForm({ onUploadSuccess }: { onUploadSuccess: 
       reset();
       setSelectedFileName(null);
     } catch (err) {
+      console.log(err)
       setError('Upload failed. Please try again.');
     }
   };

@@ -1,12 +1,10 @@
 import { OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
-import { config } from '@/lib/config';
 import fs from 'fs';
 import path from 'path';
 import { Readable } from 'stream';
 
-// Initialize Google Drive API client
-const drive = google.drive('v3');
+
 
 const getAuthClient = async (): Promise<OAuth2Client> => {
   const pwd=process.cwd();

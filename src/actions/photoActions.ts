@@ -43,7 +43,7 @@ export async function deletePhotoAction(dbDd: string,gdriveId:string) {
     await deletePhoto(dbDd)
     console.log(`Photo deleted successfully.`);
   } catch (error) {
-    console.error('Error deleting photo:');
+    console.error('Error deleting photo:',error);
     throw new Error(`Failed to delete photo`);
   }
 }

@@ -1,10 +1,9 @@
 "use client";
-import { Card, CardContent, CardMedia, Typography, Button, Box, Snackbar, CircularProgress } from "@mui/material";
+import { Card, CardContent, Typography, Button, Box, Snackbar, CircularProgress } from "@mui/material";
 import { useState } from "react";
 import { Photo } from "@/schemas/photoSchema"; // Ensure you have the correct import for Photo type
 import { deletePhotoAction } from "@/actions/photoActions";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { CopyAll } from "@mui/icons-material";
 
 interface PhotoCardProps {
   photo: Photo & { _id: string }; // Ensure _id is included in the photo prop
@@ -25,6 +24,7 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
       setSuccess(true); // Set success state if deletion is successful
       onActionComplete(); // Notify parent component
     } catch (error) {
+      console.log(error)
       // Optionally handle error (e.g., show a notification)
     } finally {
       setLoading(false); // Reset loading state
@@ -45,7 +45,7 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
   // Function to copy image tag to clipboard
   const copyToClipboard = () => {
     const gDriveId = photo.url.split('id=')[1];
-    const imgTag = `<img src="${photo.url}" caption="${photo.attributes?.caption || ''}" alt="${photo.name}" />`;
+    const imgTag = `<img src="https://drive.google.com/uc?export=view&id=${gDriveId}" caption="${photo.attributes?.caption || ''}" alt="${photo.name}" />`;
     
     navigator.clipboard.writeText(imgTag).then(() => {
       setSuccess(true); // Show success message or notification
