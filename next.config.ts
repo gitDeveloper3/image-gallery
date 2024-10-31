@@ -1,15 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      {
-        source: '/', // This is the default route
-        destination: '/gallery', // Replace with your desired route
-        permanent: true, // Set to true for a 301 redirect, false for a 302
-      },
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/', // This is the default route
+  //       destination: '/gallery', // Replace with your desired route
+  //       permanent: true, // Set to true for a 301 redirect, false for a 302
+  //     },
+  //   ];
+  // },
   /* config options here */
  experimental: {
     serverActions: {
