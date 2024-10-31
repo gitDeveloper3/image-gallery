@@ -1,32 +1,28 @@
 import { OAuth2Client } from 'google-auth-library';
-import { google } from 'googleapis';
-import fs from 'fs';
-import path from 'path';
+import { google, google as googleapis} from 'googleapis';
 import { Readable } from 'stream';
+import config from '@/lib/config';
 
 
-
+const {google:googleConfig}=config
 const getAuthClient = async (): Promise<OAuth2Client> => {
-  const pwd=process.cwd();
+  
  
-  const keyFilePath = path.join(pwd, 'keyfiles/google-service-account.json');
-
-  const keyFile = JSON.parse(fs.readFileSync(keyFilePath, 'utf8'));
-
   const auth = new google.auth.GoogleAuth({
     credentials: {
-      client_email: keyFile.client_email,
-      private_key: keyFile.private_key,
+      client_email: googleConfig.clientEmail,
+      private_key: googleConfig.privateKey,
     },
     scopes: ['https://www.googleapis.com/auth/drive.file'],
   });
 
   return (await auth.getClient()) as OAuth2Client;
 };
-
 export const uploadFileToDrive = async (file: File): Promise<string> => {
+ 
+ 
   const authClient = await getAuthClient();
-  const driveService = google.drive({ version: 'v3', auth: authClient });
+  const driveService = googleapis.drive({ version: "v3", auth: authClient });
 
   const originalFileName = file.name;
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -63,17 +59,17 @@ export const uploadFileToDrive = async (file: File): Promise<string> => {
   await driveService.permissions.create({
     fileId, // This will be a valid string
     requestBody: {
-      role: 'reader',
-      type: 'anyone',
+      role: googleConfig.requestBody.role,
+      type: googleConfig.requestBody.type,
     },
   });
-  const fileUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  const fileUrl = `${googleConfig.filePath}${fileId}`;
   return fileUrl || '';
 };
 
 export const deleteFileFromDrive = async (fileId: string): Promise<void> => {
   const authClient = await getAuthClient();
-  const driveService = google.drive({ version: 'v3', auth: authClient });
+  const driveService = googleapis.drive({ version: 'v3', auth: authClient });
 
   try {
     await driveService.files.delete({

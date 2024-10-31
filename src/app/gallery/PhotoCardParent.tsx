@@ -18,12 +18,12 @@ export default function PhotoCardParent() {
   const [tagFilter, setTagFilter] = useState("");
   const [pageFilter, setPageFilter] = useState("");
 
-  const refreshPhotos = async () => {
+  const refreshPhotos = useCallback( async () => {
     const updatedPhotos = await fetchPhotos(1, { name: nameFilter, tag: tagFilter, page: pageFilter });
     setPhotos(updatedPhotos);
     setPage(2);
     setHasMore(updatedPhotos.length > 0);
-  };
+  },[nameFilter,tagFilter,pageFilter]);
 
   const loadMorePhotos = useCallback(async () => {
     if (hasMore) {

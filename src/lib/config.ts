@@ -8,7 +8,13 @@ interface Config {
     clientEmail: string;
     privateKey: string;
     driveFolderId: string;
-    apiKey: string;  // Include if you have a separate API key for Google services
+    filePath: string;
+    scope:string; 
+    requestBody:{
+      role:string;
+      type:string;
+    },
+    version:string;
   };
   app: {
     nodeEnv: 'development' | 'production' | 'test';
@@ -24,10 +30,17 @@ const config: Config = {
     uri: process.env.MONGODB_URI ?? '',
   },
   google: {
-    clientEmail: process.env.GOOGLE_CLIENT_EMAIL ?? '',
-    privateKey: (process.env.GOOGLE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n'), // Handle multiline private key
+    clientEmail: process.env.GOOGLE_DRIVE_CLIENT_EMAIL ?? '',
+    privateKey: (process.env.GOOGLE_DRIVE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n'), 
     driveFolderId: process.env.GOOGLE_DRIVE_FOLDER_ID ?? '',
-    apiKey: process.env.GOOGLE_DRIVE_API_KEY ?? '', // Optional, include if necessary
+    filePath: process.env.GOOGLE_DRIVE_FILE_PATH ?? '', 
+    requestBody:{
+      role:process.env.GOOGLE_DRIVE_REQUEST_ROLE ?? '',
+      type:process.env.GOOGLE_DRIVE_REQUEST_TYPE ?? ''
+
+    },
+    scope:process.env.GOOGLE_DRIVE_API_KEY ?? '',
+    version:process.env.GOOGLE_DRIVE_VERSION ?? '3',
   },
   app: {
     nodeEnv: (process.env.NODE_ENV as 'development' | 'production' | 'test') ?? 'development',
