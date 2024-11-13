@@ -7,82 +7,74 @@ import {
   Box,
   Snackbar,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useState } from "react";
-import { Photo } from "@/schemas/photoSchema"; // Ensure you have the correct import for Photo type
+import { Photo } from "@/schemas/photoSchema";
 import { deletePhotoAction } from "@/actions/photoActions";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 interface PhotoCardProps {
-  photo: Photo & { _id: string }; // Ensure _id is included in the photo prop
-  onActionComplete: () => void; // Prop to notify parent component on successful upload
+  photo: Photo & { _id: string };
+  onActionComplete: () => void;
 }
 
 export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [snackbarText,setSnackbarText]=useState("Photo deleted successfully!");
+  const [snackbarText, setSnackbarText] = useState("Photo deleted successfully!");
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const overflowStles={
-    textOverflow:"ellipsis",
-    maxWidth:"32ch",
-    overflow:"hidden",
-    whiteSpace:"nowrap"
-  }
+  const overflowStyles = {
+    textOverflow: "ellipsis",
+    maxWidth: "32ch",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+  };
+
   const handleDeletePhoto = async (dbId: string, gDriveUrl: string) => {
     const gDriveId = gDriveUrl.split("id=")[1];
-
-    setLoading(true); // Set loading to true when starting deletion
+    setLoading(true);
     try {
       await deletePhotoAction(dbId, gDriveId);
-      setSnackbarText("Photo deleted successfully")
-      setSuccess(true); // Set success state if deletion is successful
-   
-      onActionComplete(); // Notify parent component
+      setSnackbarText("Photo deleted successfully");
+      setSuccess(true);
+      onActionComplete();
     } catch (error) {
       console.log(error);
-      // Optionally handle error (e.g., show a notification)
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
-  // Load the image by setting the src from the data-src only for the clicked photo
   const handleLoadImage = (id: string) => {
     const gDriveId = photo.url.split("id=")[1];
-    const imgElement = document.getElementById(
-      `img-${id}`
-    ) as HTMLImageElement | null;
-
+    const imgElement = document.getElementById(`img-${id}`) as HTMLImageElement | null;
     if (imgElement) {
-      imgElement.src = `https://drive.google.com/thumbnail?id=${gDriveId}`; // Set src to data-src
+      imgElement.src = `https://drive.google.com/thumbnail?id=${gDriveId}`;
       setImageLoaded(true);
     }
   };
 
-  // Function to copy image tag to clipboard
-  const copyToClipboard = () => {
-    const gDriveId = photo.url.split("id=")[1];
-    const attributionEscaped = (photo.attribution || "").replace(/"/g, "&quot;");
-  
-    const imgTag = `<img src="https://drive.google.com/uc?export=view&id=${gDriveId}" caption="${
-      photo.attributes?.caption || ""
-    }" alt="${photo.name}" 
-    attribution="${attributionEscaped}"
-    />`;
-  
+  const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard
-      .writeText(imgTag)
+      .writeText(text)
       .then(() => {
-        setSnackbarText("<img> copied to clipbaord")
-        setSuccess(true); // Show success message or notification
+        setSnackbarText(`${label} copied to clipboard`);
+        setSuccess(true);
       })
       .catch((err) => {
-        console.error("Failed to copy: ", err); // Handle the error case
+        console.error("Failed to copy: ", err);
       });
   };
-  
+
+  // Modal open handler
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
 
   return (
     <Card
@@ -112,72 +104,87 @@ export default function PhotoCard({ photo, onActionComplete }: PhotoCardProps) {
       <img
         id={`img-${photo._id}`}
         src="https://dummyjson.com/image/150"
-        data-src={photo.url.trim()} // Store actual URL in data-src
+        data-src={photo.url.trim()}
         alt={photo.name}
         style={{ height: 200, display: imageLoaded ? "block" : "none" }}
       />
 
       <CardContent>
-      
-        <Typography sx={overflowStles} variant="subtitle1">
+        <Typography sx={overflowStyles} variant="subtitle1">
           <strong>Photo Name:</strong> {photo.name}
         </Typography>
-        <Typography sx={overflowStles} variant="body2">
-          <strong>Caption:</strong>{" "}
-          {photo.attributes?.caption || "No caption available"}
+        <Typography sx={overflowStyles} variant="body2">
+          <strong>Caption:</strong> {photo.attributes?.caption || "No caption available"}
         </Typography>
-        <Typography sx={overflowStles} variant="body2">
-          <strong>Uploaded by:</strong>{" "}
-          {photo.attributes?.uploadedBy || "Unknown"}
+        <Typography sx={overflowStyles} variant="body2">
+          <strong>Uploaded by:</strong> {photo.attributes?.uploadedBy || "Unknown"}
         </Typography>
-        <Typography  variant="body2">
+        <Typography variant="body2">
           <strong>Created at:</strong>{" "}
-          {new Date(
-            photo.attributes?.createdAt ?? Date.now()
-          ).toLocaleDateString()}
+          {new Date(photo.attributes?.createdAt ?? Date.now()).toLocaleDateString()}
         </Typography>
-
-        {/* Display the attribution */}
-        <Typography sx={overflowStles} variant="body2">
-          <strong>Attribution:</strong>{" "}
-          {photo.attribution || "No attribution provided"}
+        <Typography sx={overflowStyles} variant="body2">
+          <strong>Attribution:</strong> {photo.attribution || "No attribution provided"}
         </Typography>
-
-        {/* Display the tags */}
-        <Typography style={{marginTop: 1}}  variant="body2" sx={overflowStles }>
-
+        <Typography sx={overflowStyles} variant="body2">
           <strong>Tags:</strong>{" "}
           {photo.tags.length > 0 ? photo.tags.join(", ") : "No tags available"}
         </Typography>
 
-        {/* Button container with equal sizing */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          marginTop={2}
-        >
-          {/* Button to copy image tag to clipboard */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={2}>
           <Button
             variant="contained"
             color="primary"
-            sx={{ flex: 1, marginRight: 1 }} // Flex sizing with right margin
-            onClick={copyToClipboard}
-            startIcon={<ContentCopyIcon />} // Adding the icon
-          />
-
-          {/* Delete button */}
+            sx={{ flex: 1, marginRight: 1 }}
+            onClick={openModal}
+            startIcon={<ContentCopyIcon />}
+          >
+            Copy
+          </Button>
           <Button
             variant="contained"
             color="secondary"
-            sx={{ flex: 1 }} // Flex sizing
+            sx={{ flex: 1 }}
             onClick={() => handleDeletePhoto(photo._id, photo.url)}
-            disabled={loading} // Disable button while loading
+            disabled={loading}
           >
             {loading ? <CircularProgress size={24} /> : "Delete"}
           </Button>
         </Box>
       </CardContent>
+
+      <Dialog open={modalOpen} onClose={closeModal}>
+        <DialogTitle>Copy Photo Details</DialogTitle>
+        <DialogContent>
+          <Button
+            fullWidth
+            onClick={() => copyToClipboard(photo.url, "Photo URL")}
+          >
+            Copy src
+          </Button>
+          <Button
+            fullWidth
+            onClick={() =>
+              copyToClipboard(photo.attributes?.caption || "No caption", "Caption")
+            }
+          >
+            Copy Caption
+          </Button>
+          <Button
+            fullWidth
+            onClick={() =>
+              copyToClipboard(photo.attribution || "No attribution", "Attribution")
+            }
+          >
+            Copy Attribution
+          </Button>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeModal} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={success}
