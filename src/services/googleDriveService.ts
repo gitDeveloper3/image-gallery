@@ -7,7 +7,7 @@ import config from '@/lib/config';
 const {google:googleConfig}=config
 const getAuthClient = async (): Promise<OAuth2Client> => {
   
- 
+ console.log(googleConfig.privateKey)
   const auth = new google.auth.GoogleAuth({
     credentials: {
       client_email: googleConfig.clientEmail,
